@@ -27,11 +27,11 @@ const
       try {
         xhr = new ActiveXObject("Microsoft.XMLHTTP");
       } catch (e) {
-        return false;
+        return null;
       }
       return xhr;
     }
-    return false;
+    return null;
   },
   /**
    * @param {array} params
