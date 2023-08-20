@@ -12,9 +12,7 @@ const
     }
     return path;
   },
-  /**
-   * @return {void}
-   */
+
   createRequest = () => {
     if (window.XMLHttpRequest) {
       return new XMLHttpRequest();
@@ -38,7 +36,7 @@ const
    * @return {void}
    */
   sendRequest = (params) => {
-    let xhr = createRequest();
+    const xhr = createRequest();
     if (!xhr) {
       alert("Browser does not support ajax");
       return;
@@ -46,7 +44,7 @@ const
     let
       sendData,
       path = params["path"] + "?ajax=true",
-      callback = params["callback"],
+      callback = params.callback,
       requestType = params["type"],
       data = params["data"] || {},
       respType = params["respType"] || "json",
@@ -72,7 +70,7 @@ const
     }
     xhr.open(requestType, path, true);
     xhr.setRequestHeader("Content-Type", contentType);
-    xhr.onreadystatechange = function () {
+    xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {
         if (xhr.status === 200) {
           let rData = xhr.responseText;
@@ -114,11 +112,11 @@ const ajax = {
       data = {};
     }
     sendRequest({
+      type: "GET",
       path: path,
       data: data,
       callback: callback,
       respType: respType,
-      type: "GET",
       contentType: contentType,
     });
   },
@@ -134,11 +132,11 @@ const ajax = {
    */
   post: (path, data, callback, respType, contentType) => {
     sendRequest({
+      type: "POST",
       path: path,
       data: data,
       callback: callback,
       respType: respType,
-      type: "POST",
       contentType: contentType,
     });
   },
