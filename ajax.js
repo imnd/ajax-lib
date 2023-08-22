@@ -21,7 +21,8 @@ const
       let xhr;
       try {
         xhr = new ActiveXObject('Msxml2.XMLHTTP');
-      } catch (e) {}
+      } catch (e) {
+      }
       try {
         xhr = new ActiveXObject('Microsoft.XMLHTTP');
       } catch (e) {
@@ -31,6 +32,7 @@ const
     }
     return null;
   },
+
   /**
    * @param {array} params
    * @return {Promise}
@@ -70,22 +72,24 @@ const
       xhr.open(requestType, path, true);
       xhr.setRequestHeader('Content-Type', contentType);
       xhr.onreadystatechange = () => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          let respData = xhr.responseText;
-          if (respType === 'json') {
-            if (respData === 'true') {
-              resolve({ success: true });
+        if (xhr.readyState === 4) {
+          if (xhr.status === 200) {
+            let respData = xhr.responseText;
+            if (respType === 'json') {
+              if (respData === 'true') {
+                resolve({ success: true });
+              }
+              if (respData === 'false') {
+                resolve({ success: false });
+              }
+              const eData = !(/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/.test(respData.replace(/"(\\.|[^"\\])*"/g, ''))) && eval('(' + respData + ')');
+              resolve(new Object(eData));
+            } else {
+              resolve(respData);
             }
-            if (respData === 'false') {
-              resolve({ success: false });
-            }
-            const eData = !(/[^,:{}\[\]0-9.\-+Eaeflnr-u \n\r\t]/.test(respData.replace(/"(\\.|[^"\\])*"/g, ''))) && eval('(' + respData + ')');
-            resolve(new Object(eData));
           } else {
-            resolve(respData);
+            reject(new Error(`Request error`))
           }
-        } else {
-          reject(new Error(`Request error`))
         }
       };
       // The request body is ready, send it
@@ -103,7 +107,7 @@ const ajax = {
    * @param {string} contentType
    * @return {Promise}
    */
-  get: (path, data, respType, contentType) => {
+  get: async (path, data, respType, contentType) => {
     return new Promise(function (resolve, reject) {
       sendRequest({
         type: 'GET',
@@ -112,12 +116,9 @@ const ajax = {
         respType: respType,
         contentType: contentType,
       })
-        .then(result => {
-          resolve(result)
-        })
-        .catch(e => {
-          reject(e);
-        });
+        .then(result => resolve(result))
+        .catch(e => reject(e))
+      ;
     });
   },
   /**
@@ -129,7 +130,7 @@ const ajax = {
    * @param {string} contentType
    * @return {Promise}
    */
-  post: (path, data, respType, contentType) => {
+  post: async (path, data, respType, contentType) => {
     return new Promise(function (resolve, reject) {
       sendRequest({
         type: 'POST',
@@ -138,12 +139,8 @@ const ajax = {
         respType: respType,
         contentType: contentType,
       })
-        .then(result => {
-          resolve(result)
-        })
-        .catch(e => {
-          reject(e);
-        });
+        .then(result => resolve(result))
+        .catch(e => reject(e));
     });
   },
 };
